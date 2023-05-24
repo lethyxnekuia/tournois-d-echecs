@@ -1,5 +1,10 @@
 
-from views import  main_view
+import json
+from views import main_view
+from models.player import Player
+from models.tournament import Tournament
+from models.round import Round
+
 
 class SaveAndLoadMenuController:
 
@@ -10,8 +15,8 @@ class SaveAndLoadMenuController:
 
     def start(self):
         self.save_menu = {
-            "1" : {"label" : "Sauvegarder les données", "action" : self.save},
-            "2" : {"label" : "Charger des données", "action" : self.load},
+            "1": {"label": "Sauvegarder les données", "action": self.save},
+            "2": {"label": "Charger des données", "action": self.load},
         }
         entry = self.main_view.menu_choice(self.save_menu)
         entry["action"]()
@@ -20,64 +25,71 @@ class SaveAndLoadMenuController:
         players = []
         tournaments = []
         for player in self.players:
-            players.append(self.player_serializer(player))
+            players.append(Player.player_serializer(player))
         for tournament in self.tournaments:
-            tournaments.append(self.tournament_serializer(tournament))
-        save_dict ={
-            "players" : players,
-            "tournaments":tournaments
+            tournaments.append(Tournament.tournament_serializer(tournament))
+        save_dict = {
+            "players": players,
+            "tournaments": tournaments
         }
-        
+        with open("data.json", "w") as outfile:
+            json.dump(save_dict, outfile)
 
+    def load(self):
+        with open('data.json') as data:
+            data = json.load(data)
+        for player in data["players"]:
+            new_player = Player(
+                player["name"],
+                player["first_name"],
+                player["birthday"],
+                player["ranking"],
+                player["player_id"]
+            )
+            self.players.append(new_player)
+        for tournament in data["tournaments"]:
+            new_tournament = Tournament(
+                tournament["tournament_name"],
+                tournament["place"],
+                tournament["date"],
+                int(tournament["number_of_rounds"]),
+                tournament["description"],
+                tournament["tournament_id"],
+                self.load_players(tournament["players"]),
+                self.load_rounds(tournament["rounds"])
+            )
+            self.tournaments.append(new_tournament)
 
+    def load_players(self, players_id):
+        players = []
+        for player_id in players_id:
+            player = self.load_player(player_id)
+            players.append(player)
+        return players
 
+    def load_player(self, player_id):
+        for player in self.players:
+            if player.player_id == player_id:
+                return player
 
-
-    def player_serializer(player):
-        return {
-            "name": player.name,
-            "first_name": player.first_name,
-            "birthday": player.birthday,
-            "ranking": player.ranking,
-            "player_id":player.player_id,
-        }
-    
-    def tournament_serializer(self, tournament):
-        return {
-            "tournament_name": tournament.tournament_name,
-            "place": tournament.place,
-            "date": tournament.date,
-            "number_of_rounds": tournament.number_of_rounds,
-            "description":tournament.description,
-            "tournament_id":tournament.tournament_id,
-            "players_by_ids": self.get_players_id(tournament.players),
-            "rounds":self.get_rounds(tournament.rounds),
-        }
-    
-    def get_players_id(self, players):
-        players_id = []
-        for player in players:
-            players_id.append(player.player_id)
-        return players_id
-    
-    def get_rounds(self, rounds):
+    def load_rounds(self, rounds_data):
         rounds = []
-        for round in rounds:
-            rounds.append(self.round_serializer(round))
+        for round_data in rounds_data:
+            round = Round(
+                round_data["round_name"],
+                round_data["date_begin"],
+                round_data["date_end"],
+                self.load_matchs(round_data["mactch_list"])
+            )
+            rounds.append(round)
+        return rounds
 
-
-    def round_serializer(self, round):
-        return{
-            "round_name":round.round_name,
-            "date_begin":round.date_begin,
-            "date_end":round.date_end,
-            "match_list":self.get_match_list(round.match_list)
-        }
-    
-    def get_match_list(self, match_list):
-        return{
-           "player_one":match_list[0][0].player_id,
-           "score_player_one":match_list[0][1],
-           "player_two":match_list[1][0].player_id,
-           "score_player_two":match_list[1][1]   
-        }
+    def load_matchs(self, matchs_data):
+        matchs = []
+        for match_data in matchs_data:
+            match = [
+                (self.load_player(match_data["player_one"][0]), match_data["player_one"][1]),
+                (self.load_player(match_data["player_two"][0]), match_data["player_two"][1])
+            ]
+            matchs.append(match)
+        return matchs

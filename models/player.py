@@ -11,3 +11,11 @@ class Player(object):
         self.ranking = ranking
         self.player_id = player_id
 
+    def player_serializer(player):
+        return {
+            "name": player.name,
+            "first_name": player.first_name,
+            "birthday": player.birthday,
+            "ranking": player.ranking,
+            "player_id": player.player_id,
+        }
