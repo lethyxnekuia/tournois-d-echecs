@@ -1,6 +1,6 @@
 import re
-from datetime import datetime
-name_regex = re.compile('^[A-Z][A-Za-z\é\è\ê\ë\-]+$')
+from models.player import Player
+name_regex = re.compile('^[A-Z][A-Za-zéèêëïî-]+$')
 id_regex = re.compile('^[a-zA-Z0-9]+$')
 date_regex = re.compile('^[0-9]{1,2}\\/[0-9]{1,2}\\/[0-9]{4}$')
 
@@ -21,10 +21,10 @@ class PlayerView:
         while name_regex.match(str(self.first_name)) is None:
             print("Veuillez rentrer un prénom valide")
             self.first_name = input("Prenom : ")
-        self.birthday = input("Date de naissance (aaaa/mm/jj) : ")
-        while self.birthday != datetime.strptime(self.birthday, "%Y-%m-%d").strftime('%Y-%m-%d'):
+        self.birthday = input("Date de naissance (aaaa-mm-jj) : ")
+        while not Player.validate_date(self.birthday):
             print("Veuillez rentrer une date valide")
-            self.birthday = input("Date du tournoi (aaaa/mm/jj) : ")
+            self.birthday = input("Date du tournoi (aaaa-mm-jj) : ")
         self.ranking = input("Veuillez saisir le numéro du classement : ")
         while not self.ranking.isdigit():
             print("Veuillez rentrer un numéro valide")
@@ -54,4 +54,3 @@ class PlayerView:
     def display_select_a_player(self):
         print("_______   Sélectionner un Joueur   ________")
         print("")
-
