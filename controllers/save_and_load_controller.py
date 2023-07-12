@@ -35,8 +35,8 @@ class SaveAndLoadMenuController:
             json.dump(save_dict, outfile)
 
     def load(self):
-        self.players = []
-        self.tournaments = []
+        self.players.clear()
+        self.tournaments.clear()
         with open('data.json') as data:
             data = json.load(data)
         for player in data["players"]:
