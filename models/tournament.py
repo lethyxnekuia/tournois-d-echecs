@@ -1,4 +1,6 @@
 from models.round import Round
+from models.player import Player
+from datetime import datetime
 
 
 class Tournament(object):
@@ -20,26 +22,42 @@ class Tournament(object):
         self.players = players if players is not None else []
         self.rounds = rounds if rounds is not None else []
 
-    def tournament_serializer(self, tournament):
+    @staticmethod
+    def tournament_serializer(tournament):
         return {
             "tournament_name": tournament.tournament_name,
             "place": tournament.place,
-            "date": tournament.date,
+            "date": tournament.date.strftime("%Y-%m-%d"),
             "number_of_rounds": tournament.number_of_rounds,
             "description": tournament.description,
             "tournament_id": tournament.tournament_id,
-            "players": self.get_players_id(tournament.players),
-            "rounds": self.get_rounds(tournament.rounds),
+            "players": Tournament.get_players_id(tournament.players),
+            "rounds": Tournament.get_rounds(tournament.rounds),
         }
 
-    def get_players_id(self, players):
+    @staticmethod
+    def get_players_id(players):
         players_id = []
         for player in players:
             players_id.append(player.player_id)
         return players_id
 
-    def get_rounds(self, rounds):
-        rounds = []
+    @staticmethod
+    def get_rounds(rounds):
+        rounds_list = []
         for round in rounds:
-            rounds.append(Round.round_serializer(round))
-        return rounds
+            rounds_list.append(Round.round_serializer(round))
+        return rounds_list
+
+    @staticmethod
+    def tournament_loader(tournament, players):
+        return Tournament(
+            tournament["tournament_name"],
+            tournament["place"],
+            datetime.strptime(tournament["date"], "%Y-%m-%d"),
+            int(tournament["number_of_rounds"]),
+            tournament["description"],
+            tournament["tournament_id"],
+            Player.load_players(tournament["players"], players),
+            Round.load_rounds(tournament["rounds"], players)
+            )

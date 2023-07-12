@@ -2,7 +2,6 @@ import re
 from models.player import Player
 name_regex = re.compile('^[A-Z][A-Za-zéèêëïî-]+$')
 id_regex = re.compile('^[a-zA-Z0-9]+$')
-date_regex = re.compile('^[0-9]{1,2}\\/[0-9]{1,2}\\/[0-9]{4}$')
 
 
 class TournamentView:
@@ -21,10 +20,10 @@ class TournamentView:
         while name_regex.match(str(self.place)) is None:
             print("Veuillez rentrer un lieu valide")
             self.place = input("lieu du tournoi : ")
-        self.date = input("Date du tournoi (jj-mm-aaaa) : ")
-        while not Player.validate_date(self.date):
+        self.date = Player.validate_date(input("Date du tournoi (aaaa-mm-jj) : "))
+        while not self.date:
             print("Veuillez rentrer une date valide")
-            self.date = input("Date du tournoi (jj-mm-aaaa) : ")
+            self.date = Player.validate_date(input("Date du tournoi (aaaa-mm-jj) : "))
         self.number_of_rounds = input("Nombre de rounds : ")
         while not self.number_of_rounds.isdigit():
             print("Veuillez rentrer un nombre valide")
@@ -85,7 +84,7 @@ class TournamentView:
         print(f"2 : {match[1][0].name}")
         print("3 : Match Nul")
         entry = input("Choisir parmis les propositions :")
-        while entry not in [1, 2, 3]:
+        while entry not in ["1", "2", "3"]:
             print("option invalide")
             entry = input("Choisir parmis les propositions :")
         print("____________________________________________")

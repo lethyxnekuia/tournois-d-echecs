@@ -56,6 +56,9 @@ class TournamentMenuController:
 
         tournament_index = int(self.tournament_choice(self.tournaments)) - 1
         tournament = self.tournaments[tournament_index]
+        if tournament.rounds.length > 0:
+            self.main_view.impossible_action()
+            return
         filtered_players_list = self.players_list_filter(self.players, tournament.players)
         if not filtered_players_list:
             self.main_view.impossible_action()
@@ -79,6 +82,7 @@ class TournamentMenuController:
         return filtered_players
 
     def tournament_choice(self, tournaments):
+        self.tounament_choice_menu = {}
         for count, tournament in enumerate(tournaments, start=1):
             self.tounament_choice_menu[f"{count}"] = {
                 "label": tournament.tournament_name,
@@ -95,7 +99,7 @@ class TournamentMenuController:
 
         tournament_index = int(self.tournament_choice(self.tournaments)) - 1
         tournament = self.tournaments[tournament_index]
-        if len(tournament.rounds) > 0 and tournament.rounds[-1].date_end == "":
+        if len(tournament.rounds) > 0 and not tournament.rounds[-1].date_end:
             self.main_view.impossible_action()
             return
 
@@ -106,50 +110,51 @@ class TournamentMenuController:
             return
 
         player_list_with_score = self.add_score_to_player(players_list, tournament)
-        sorted_players_list_by_score = sorted(player_list_with_score, key=lambda player: player["tournament_score"])
+        sorted_players = sorted(player_list_with_score, key=lambda player: player["tournament_score"])
         round_match_list = []
-        for i in range(players_count/2):
-            player_one = sorted_players_list_by_score[0]
+        for i in range(1, players_count//2):
+            player_one = sorted_players[0]
             count = 1
             potential_choice_list = []
-            while count != 0:
+            while count != 0 or count >= len(sorted_players):
                 potential_player = self.potential_player(
-                    player_one["player"], sorted_players_list_by_score[count]["player"],
+                    player_one["player"], sorted_players[count]["player"],
                     tournament.rounds
                 )
                 if not potential_player:
                     count = count + 1
-
                 else:
-                    potential_choice_list.append(sorted_players_list_by_score[count])
-                    tournament_score_one = sorted_players_list_by_score[count]["tournament_score"]
-                    tournament_score_two = sorted_players_list_by_score[count + 1]["tournament_score"]
-                    if tournament_score_one == tournament_score_two:
+                    potential_choice_list.append(sorted_players[count])
+                    if self.isOverPotentialPlayer(count, sorted_players, sorted_players[count]["tournament_score"]):
                         count = count + 1
-
                     else:
                         player_two_index = random.randrange(len(potential_choice_list))
                         player_two = potential_choice_list[player_two_index]
                         round_match_list.append([(player_one["player"], 0), (player_two["player"], 0)])
-                        sorted_players_list_by_score.remove(player_one)
-                        sorted_players_list_by_score.remove(player_two)
+                        sorted_players.remove(player_one)
+                        sorted_players.remove(player_two)
                         count = 0
-
-        while sorted_players_list_by_score != []:
-            player_one = sorted_players_list_by_score[0]
-            player_two = sorted_players_list_by_score[1]
-            round_match_list.append([(player_one["player"], 0), (player_two["player"], 0)])
-            sorted_players_list_by_score.remove(player_one)
-            sorted_players_list_by_score.remove(player_two)
+                count = 0
+        while sorted_players != []:
+            round_match_list.append([(sorted_players[0]["player"], 0), (sorted_players[1]["player"], 0)])
+            sorted_players.remove(sorted_players[0])
+            sorted_players.remove(sorted_players[1])
         round = self.create_round_instance(round_match_list, tournament)
         tournament.rounds.append(round)
+
+    def isOverPotentialPlayer(self, count, sorted_players, tournament_score_one):
+        if count < (len(sorted_players) - 1):
+            tournament_score_two = sorted_players[count + 1]["tournament_score"]
+            if tournament_score_one == tournament_score_two:
+                return True
+        return False
 
     def add_score_to_player(self, player_list, tournament):
         list_with_score = []
         for player in player_list:
             tournament_score = 0
             for round in tournament.rounds:
-                for match in round:
+                for match in round.match_list:
                     if match[0][0] == player:
                         tournament_score += match[0][1]
                     if match[1][0] == player:
@@ -165,11 +170,12 @@ class TournamentMenuController:
             None,
             round_match_list,
         )
+        print(new_round)
         return new_round
 
     def potential_player(self, player_one, player_two, rounds):
         for round in rounds:
-            for match in round.mactch_list:
+            for match in round.match_list:
                 if match[0][0] == player_one:
                     if match[1][0] == player_two:
                         return False
@@ -181,25 +187,26 @@ class TournamentMenuController:
     def write_score(self):
         tournament_index = int(self.tournament_choice(self.tournaments)) - 1
         tournament = self.tournaments[tournament_index]
-        if tournament.rounds[-1].date_end != "":
+        if tournament.rounds[-1].date_end:
             self.main_view.impossible_action()
             return
 
-        match_list_choice = []
+        match_list_choice = {}
         for count, match in enumerate(tournament.rounds[-1].match_list, start=1):
+
             if match[0][1] == 0 and match[1][1] == 0:
                 match_list_choice[f"{count}"] = {"player_one": match[0][0].name,  "player_two": match[1][0].name}
 
-        match_index = int(self.view.match_choice(self.tounament_choice_menu))-1
+        match_index = int(self.view.match_choice(match_list_choice))-1
         match = tournament.rounds[-1].match_list[match_index]
-        winner = self.view.select_winner(match)
+        winner = int(self.view.select_winner(match))
         if winner == 1:
-            tournament.rounds[-1].match_list[match_index][0][1] = 1
+            match[0] = (match[0][0], 1)
         if winner == 2:
-            tournament.rounds[-1].match_list[match_index][1][1] = 1
+            match[1] = (match[1][0], 1)
         if winner == 3:
-            tournament.rounds[-1].match_list[match_index][0][1] = 0.5
-            tournament.rounds[-1].match_list[match_index][1][1] = 0.5
+            match[0] = (match[0][0], 0.5)
+            match[1] = (match[1][0], 0.5)
 
         if len(match_list_choice) == 1:
             tournament.rounds[-1].date_end = datetime.now()

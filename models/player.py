@@ -14,18 +14,43 @@ class Player(object):
         self.ranking = ranking
         self.player_id = player_id
 
+    @staticmethod
     def player_serializer(player):
         return {
             "name": player.name,
             "first_name": player.first_name,
-            "birthday": player.birthday,
+            "birthday": player.birthday.strftime("%Y-%m-%d"),
             "ranking": player.ranking,
             "player_id": player.player_id,
         }
 
+    @staticmethod
+    def player_loader(player):
+        return Player(
+                player["name"],
+                player["first_name"],
+                datetime.strptime(player["birthday"], "%Y-%m-%d"),
+                player["ranking"],
+                player["player_id"]
+            )
+
+    @staticmethod
     def validate_date(date):
         try:
-            if date != datetime.strptime(date, "%Y-%m-%d"):
-                return True
+            return datetime.strptime(date, "%Y-%m-%d")
         except ValueError:
             return False
+
+    @staticmethod
+    def load_players(players_id, players):
+        tournament_players = []
+        for player_id in players_id:
+            player = Player.load_player(player_id, players)
+            tournament_players.append(player)
+        return tournament_players
+
+    @staticmethod
+    def load_player(player_id, players):
+        for player in players:
+            if player.player_id == player_id:
+                return player

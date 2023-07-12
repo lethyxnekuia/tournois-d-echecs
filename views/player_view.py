@@ -21,10 +21,10 @@ class PlayerView:
         while name_regex.match(str(self.first_name)) is None:
             print("Veuillez rentrer un prénom valide")
             self.first_name = input("Prenom : ")
-        self.birthday = input("Date de naissance (aaaa-mm-jj) : ")
-        while not Player.validate_date(self.birthday):
+        self.birthday = Player.validate_date(input("Date de naissance (aaaa-mm-jj) : "))
+        while not self.birthday:
             print("Veuillez rentrer une date valide")
-            self.birthday = input("Date du tournoi (aaaa-mm-jj) : ")
+            self.birthday = Player.validate_date(input("Date de naissance (aaaa-mm-jj) : "))
         self.ranking = input("Veuillez saisir le numéro du classement : ")
         while not self.ranking.isdigit():
             print("Veuillez rentrer un numéro valide")
