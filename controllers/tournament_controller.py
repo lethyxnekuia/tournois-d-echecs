@@ -26,10 +26,14 @@ class TournamentMenuController:
             "7": {"label": "Nom et Date d'un Tournoi", "action": self.tournament_date_and_name},
             "8": {"label": "Liste des rounds d'un Tournoi", "action": self.tournament_rounds},
             "9": {"label": "Liste des matchs d'un Round", "action": self.tournament_round_matchs},
+            "10": {"label": "Retour", "action": self.back},
         }
         entry = self.main_view.menu_choice(self.tournament_menu)
         entry["action"]()
 
+    def back(self):
+        return
+    
     def create_tournament(self):
         tournament = self.view.input_tournament()
         new_tournament = Tournament(
@@ -56,7 +60,7 @@ class TournamentMenuController:
 
         tournament_index = int(self.tournament_choice(self.tournaments)) - 1
         tournament = self.tournaments[tournament_index]
-        if tournament.rounds.length > 0:
+        if len(tournament.rounds) > 0:
             self.main_view.impossible_action()
             return
         filtered_players_list = self.players_list_filter(self.players, tournament.players)
@@ -138,7 +142,7 @@ class TournamentMenuController:
         while sorted_players != []:
             round_match_list.append([(sorted_players[0]["player"], 0), (sorted_players[1]["player"], 0)])
             sorted_players.remove(sorted_players[0])
-            sorted_players.remove(sorted_players[1])
+            sorted_players.remove(sorted_players[0])
         round = self.create_round_instance(round_match_list, tournament)
         tournament.rounds.append(round)
 
@@ -185,11 +189,15 @@ class TournamentMenuController:
         return True
 
     def write_score(self):
+        if len(self.tournaments) == 0:
+            self.view.tournament_impossible_action()
+            return
         tournament_index = int(self.tournament_choice(self.tournaments)) - 1
         tournament = self.tournaments[tournament_index]
-        if tournament.rounds[-1].date_end:
-            self.main_view.impossible_action()
-            return
+        if len(tournament.rounds) > 0:
+            if tournament.rounds[-1].date_end:
+                self.main_view.impossible_action()
+                return
 
         match_list_choice = {}
         for count, match in enumerate(tournament.rounds[-1].match_list, start=1):
@@ -212,27 +220,45 @@ class TournamentMenuController:
             tournament.rounds[-1].date_end = datetime.now()
 
     def tournament_players(self):
+        if len(self.tournaments) == 0:
+            self.view.tournament_impossible_action()
+            return
         tournament_index = int(self.tournament_choice(self.tournaments)) - 1
         tournament = self.tournaments[tournament_index]
         players = sorted(tournament.players, key=lambda player: player.name)
         self.player_view.display_player(players)
 
     def tournament_date_and_name(self):
+        if len(self.tournaments) == 0:
+            self.view.tournament_impossible_action()
+            return
         tournament_index = int(self.tournament_choice(self.tournaments)) - 1
         tournament = self.tournaments[tournament_index]
         self.view.tournament_date_and_name(tournament)
 
     def tournament_rounds(self):
+        if len(self.tournaments) == 0:
+            self.view.tournament_impossible_action()
+            return
         tournament_index = int(self.tournament_choice(self.tournaments)) - 1
         tournament = self.tournaments[tournament_index]
+        if len(tournament.rounds) == 0:
+            self.main_view.round_impossible_action()
+            return
         self.view.tournament_rounds(tournament)
 
     def tournament_round_matchs(self):
+        if len(self.tournaments) == 0:
+            self.view.tournament_impossible_action()
+            return
         tournament_index = int(self.tournament_choice(self.tournaments)) - 1
         tournament = self.tournaments[tournament_index]
-        rounds = []
+        if len(tournament.rounds) == 0:
+            self.main_view.round_impossible_action()
+            return
+        rounds = {}
         for count, round in enumerate(tournament.rounds, start=1):
-            rounds[f"{count}"] = {"Nom": round.round_name}
-        round_index = int(self.main_view.menu_choice(rounds)) - 1
+            rounds[f"{count}"] = {"label": round.round_name}
+        round_index = int(self.view.tournament_choice(rounds)) - 1
         round = tournament.rounds[round_index]
-        self.view.tournament_round_matchs(tournament)
+        self.view.tournament_round_matchs(round)

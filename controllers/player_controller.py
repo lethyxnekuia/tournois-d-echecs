@@ -14,9 +14,13 @@ class PlayerMenuController:
         self.player_menu = {
             "1": {"label": "Créer un Joueur", "action": self.create_player},
             "2": {"label": "Liste des Joueurs", "action": self.player_list},
+            "3": {"label": "Retour", "action": self.back},
         }
         entry = self.main_view.menu_choice(self.player_menu)
         entry["action"]()
+    
+    def back(self):
+        return
 
     def create_player(self):
         player = self.view.input_player()
@@ -30,5 +34,8 @@ class PlayerMenuController:
         self.players.append(new_player)
 
     def player_list(self):
+        if len(self.players) == 0:
+            self.main_view.impossible_action()
+            return
         players = sorted(self.players, key=lambda player: player.name)
         self.view.display_player(players)

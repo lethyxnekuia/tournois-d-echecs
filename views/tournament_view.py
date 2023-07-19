@@ -25,7 +25,7 @@ class TournamentView:
             print("Veuillez rentrer une date valide")
             self.date = Player.validate_date(input("Date du tournoi (aaaa-mm-jj) : "))
         self.number_of_rounds = input("Nombre de rounds : ")
-        while not self.number_of_rounds.isdigit():
+        while not self.number_of_rounds.isdigit() and self.number_of_rounds != "0":
             print("Veuillez rentrer un nombre valide")
             self.number_of_rounds = input("Nombre de rounds : ")
         self.description = input("Description du tournoi : ")
@@ -103,3 +103,13 @@ class TournamentView:
         for match in round.match_list:
             print(f"Joueur 1: {match[0][0].name}, Score:  {match[0][1]}")
             print(f"Joueur 2: {match[1][0].name}, Score:  {match[1][1]}")
+    
+    def tournament_impossible_action(self):
+        print("Action impossible : Aucun tournoi disponible")
+        print("____________________________________________")
+        print("")
+    
+    def round_impossible_action(self):
+        print("Action impossible : Aucun round disponible")
+        print("____________________________________________")
+        print("")

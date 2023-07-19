@@ -16,9 +16,13 @@ class SaveAndLoadMenuController:
         self.save_menu = {
             "1": {"label": "Sauvegarder les données", "action": self.save},
             "2": {"label": "Charger des données", "action": self.load},
+            "3": {"label": "Retour", "action": self.back},
         }
         entry = self.main_view.menu_choice(self.save_menu)
         entry["action"]()
+
+    def back(self):
+        return
 
     def save(self):
         players = []
@@ -37,11 +41,16 @@ class SaveAndLoadMenuController:
     def load(self):
         self.players.clear()
         self.tournaments.clear()
-        with open('data.json') as data:
-            data = json.load(data)
-        for player in data["players"]:
-            new_player = Player.player_loader(player)
-            self.players.append(new_player)
-        for tournament in data["tournaments"]:
-            new_tournament = Tournament.tournament_loader(tournament, self.players)
-            self.tournaments.append(new_tournament)
+        try:
+            with open('data.json') as data:
+                data = json.load(data)
+            for player in data["players"]:
+                new_player = Player.player_loader(player)
+                self.players.append(new_player)
+            for tournament in data["tournaments"]:
+                new_tournament = Tournament.tournament_loader(tournament, self.players)
+                self.tournaments.append(new_tournament)
+        except:
+            self.main_view.impossible_action()
+            return
+
