@@ -33,7 +33,7 @@ class TournamentMenuController:
 
     def back(self):
         return
-    
+
     def create_tournament(self):
         tournament = self.view.input_tournament()
         new_tournament = Tournament(
@@ -55,17 +55,17 @@ class TournamentMenuController:
         self.tounament_choice_menu = {}
 
         if not self.tournaments:
-            self.main_view.impossible_action()
+            self.main_view.impossible_action("Il n'y a pas de tournoi")
             return
 
         tournament_index = int(self.tournament_choice(self.tournaments)) - 1
         tournament = self.tournaments[tournament_index]
         if len(tournament.rounds) > 0:
-            self.main_view.impossible_action()
+            self.main_view.impossible_action("ce tournoi a déjà commencé")
             return
         filtered_players_list = self.players_list_filter(self.players, tournament.players)
         if not filtered_players_list:
-            self.main_view.impossible_action()
+            self.main_view.impossible_action("Il n'y a aucun joueur disponible")
             return
 
         for count, player in enumerate(filtered_players_list, start=1):
@@ -98,19 +98,19 @@ class TournamentMenuController:
     def create_a_round(self):
         self.tounament_choice_menu = {}
         if not self.tournaments:
-            self.main_view.impossible_action()
+            self.main_view.impossible_action("Il n'y a pas de tournoi")
             return
 
         tournament_index = int(self.tournament_choice(self.tournaments)) - 1
         tournament = self.tournaments[tournament_index]
         if len(tournament.rounds) > 0 and not tournament.rounds[-1].date_end:
-            self.main_view.impossible_action()
+            self.main_view.impossible_action("Les scores du précédent round doivent être remplis")
             return
 
         players_list = tournament.players
         players_count = len(players_list)
         if players_count < 2 or players_count % 2 != 0 or len(tournament.rounds) >= tournament.number_of_rounds:
-            self.main_view.impossible_action()
+            self.main_view.impossible_action("Il n'y a pas assez de joueurs ou de round dans ce tournoi")
             return
 
         player_list_with_score = self.add_score_to_player(players_list, tournament)
@@ -190,14 +190,13 @@ class TournamentMenuController:
 
     def write_score(self):
         if len(self.tournaments) == 0:
-            self.view.tournament_impossible_action()
+            self.main_view.impossible_action("Il n'y a pas de tournoi")
             return
         tournament_index = int(self.tournament_choice(self.tournaments)) - 1
         tournament = self.tournaments[tournament_index]
-        if len(tournament.rounds) > 0:
-            if tournament.rounds[-1].date_end:
-                self.main_view.impossible_action()
-                return
+        if len(tournament.rounds) > 0 and tournament.rounds[-1].date_end:
+            self.main_view.impossible_action("Il n'y a pas de score à remplir dans ce tournoi")
+            return
 
         match_list_choice = {}
         for count, match in enumerate(tournament.rounds[-1].match_list, start=1):
@@ -221,7 +220,7 @@ class TournamentMenuController:
 
     def tournament_players(self):
         if len(self.tournaments) == 0:
-            self.view.tournament_impossible_action()
+            self.main_view.impossible_action("Il n'y a pas de tournoi")
             return
         tournament_index = int(self.tournament_choice(self.tournaments)) - 1
         tournament = self.tournaments[tournament_index]
@@ -230,7 +229,7 @@ class TournamentMenuController:
 
     def tournament_date_and_name(self):
         if len(self.tournaments) == 0:
-            self.view.tournament_impossible_action()
+            self.main_view.impossible_action("Il n'y a pas de tournoi")
             return
         tournament_index = int(self.tournament_choice(self.tournaments)) - 1
         tournament = self.tournaments[tournament_index]
@@ -238,23 +237,23 @@ class TournamentMenuController:
 
     def tournament_rounds(self):
         if len(self.tournaments) == 0:
-            self.view.tournament_impossible_action()
+            self.main_view.impossible_action("Il n'y a pas de tournoi")
             return
         tournament_index = int(self.tournament_choice(self.tournaments)) - 1
         tournament = self.tournaments[tournament_index]
         if len(tournament.rounds) == 0:
-            self.main_view.round_impossible_action()
+            self.main_view.impossible_action("Il n'y a pas de round")
             return
         self.view.tournament_rounds(tournament)
 
     def tournament_round_matchs(self):
         if len(self.tournaments) == 0:
-            self.view.tournament_impossible_action()
+            self.main_view.impossible_action("Il n'y a pas de tournoi")
             return
         tournament_index = int(self.tournament_choice(self.tournaments)) - 1
         tournament = self.tournaments[tournament_index]
         if len(tournament.rounds) == 0:
-            self.main_view.round_impossible_action()
+            self.main_view.impossible_action("Il n'y a pas de round")
             return
         rounds = {}
         for count, round in enumerate(tournament.rounds, start=1):

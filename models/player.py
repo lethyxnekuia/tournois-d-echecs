@@ -42,6 +42,16 @@ class Player(object):
             return False
 
     @staticmethod
+    def validate_birth_date(date):
+        try:
+            formated_date = datetime.strptime(date, "%Y-%m-%d")
+            if datetime.now() < formated_date:
+                return False
+            return formated_date
+        except ValueError:
+            return False
+
+    @staticmethod
     def load_players(players_id, players):
         tournament_players = []
         for player_id in players_id:

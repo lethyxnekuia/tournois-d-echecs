@@ -16,8 +16,9 @@ class MainView:
         print("")
         return menu[entry]
 
-    def impossible_action(self):
+    def impossible_action(self, info):
         print("Action impossible")
+        print(info)
         print("____________________________________________")
         print("")
 

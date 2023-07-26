@@ -18,7 +18,7 @@ class PlayerMenuController:
         }
         entry = self.main_view.menu_choice(self.player_menu)
         entry["action"]()
-    
+
     def back(self):
         return
 
@@ -35,7 +35,7 @@ class PlayerMenuController:
 
     def player_list(self):
         if len(self.players) == 0:
-            self.main_view.impossible_action()
+            self.main_view.impossible_action("Il n'y a pas de joueur")
             return
         players = sorted(self.players, key=lambda player: player.name)
         self.view.display_player(players)

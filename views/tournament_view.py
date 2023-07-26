@@ -103,13 +103,3 @@ class TournamentView:
         for match in round.match_list:
             print(f"Joueur 1: {match[0][0].name}, Score:  {match[0][1]}")
             print(f"Joueur 2: {match[1][0].name}, Score:  {match[1][1]}")
-    
-    def tournament_impossible_action(self):
-        print("Action impossible : Aucun tournoi disponible")
-        print("____________________________________________")
-        print("")
-    
-    def round_impossible_action(self):
-        print("Action impossible : Aucun round disponible")
-        print("____________________________________________")
-        print("")
