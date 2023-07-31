@@ -19,10 +19,10 @@ python main.py
 ### Menus
 
 - for exemple the first menu is :
-    1 : Menu Joueur
-    2 : Menu Tournoi
-    3 : Menu Sauvegarde
-    4 : Quitter
+    - 1 : Menu Joueur
+    - 2 : Menu Tournoi
+    - 3 : Menu Sauvegarde
+    - 4 : Quitter
 
 -   write 1 to go to "Menu Joueur" 
 -   write 2 to go to "Menu Tournoi"
@@ -38,6 +38,7 @@ python main.py
 
 Open a terminal in chess_tournament folder and make sure virtual environment is activated.
 
+```bash
 flake8
 ```
 
