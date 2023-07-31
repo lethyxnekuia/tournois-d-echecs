@@ -10,7 +10,7 @@ class PlayerView:
         print("_____________    Menu Joueur    _____________")
         print("")
 
-    def input_player(self):
+    def input_player(self, players):
         print("___________   Ajouter un joueur   ___________")
         print("")
         self.name = input("Nom : ")
@@ -30,8 +30,8 @@ class PlayerView:
             print("Veuillez rentrer un numéro valide")
             self.ranking = input("Veuillez saisir le numéro du classement : ")
         self.player_id = input("Veuillez saisir l'identifiant du joueur : ")
-        while id_regex.match(str(self.player_id)) is None:
-            print("Veuillez rentrer un identifiant valide")
+        while id_regex.match(str(self.player_id)) is None or not Player.unique_id(players, self.player_id):
+            print("Veuillez rentrer un identifiant unique et valide")
             self.player_id = input("Veuillez saisir l'identifiant du joueur : ")
         print("____________________________________________")
         print("")

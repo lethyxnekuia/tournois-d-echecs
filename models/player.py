@@ -64,3 +64,10 @@ class Player(object):
         for player in players:
             if player.player_id == player_id:
                 return player
+
+    @staticmethod
+    def unique_id(players, id):
+        for player in players:
+            if player.player_id == id:
+                return False
+        return True

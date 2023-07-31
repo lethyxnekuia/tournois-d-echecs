@@ -16,7 +16,6 @@ class Round(object):
 
     @staticmethod
     def round_serializer(round):
-        print(round)
         date_end = None
         if round.date_end:
             date_end = round.date_end.strftime("%Y-%m-%d")
@@ -29,7 +28,6 @@ class Round(object):
 
     @staticmethod
     def get_match_list(match_list):
-        print(match_list)
         matchs = []
         for match in match_list:
             matchs.append({

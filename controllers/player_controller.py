@@ -23,7 +23,7 @@ class PlayerMenuController:
         return
 
     def create_player(self):
-        player = self.view.input_player()
+        player = self.view.input_player(self.players)
         new_player = Player(
             player["name"],
             player["first_name"],

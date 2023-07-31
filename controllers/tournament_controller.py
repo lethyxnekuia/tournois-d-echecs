@@ -35,7 +35,7 @@ class TournamentMenuController:
         return
 
     def create_tournament(self):
-        tournament = self.view.input_tournament()
+        tournament = self.view.input_tournament(self.tournaments)
         new_tournament = Tournament(
             tournament["tournament_name"],
             tournament["place"],
@@ -69,7 +69,10 @@ class TournamentMenuController:
             return
 
         for count, player in enumerate(filtered_players_list, start=1):
-            self.player_choice_menu[f"{count}"] = {"label": player.player_id, "player": player}
+            self.player_choice_menu[f"{count}"] = {
+                "label": f"{player.player_id} : {player.name}, {player.first_name}",
+                "player": player,
+            }
 
         player = self.main_view.menu_choice(self.player_choice_menu)
         tournament.players.append(player["player"])
@@ -194,7 +197,7 @@ class TournamentMenuController:
             return
         tournament_index = int(self.tournament_choice(self.tournaments)) - 1
         tournament = self.tournaments[tournament_index]
-        if len(tournament.rounds) > 0 and tournament.rounds[-1].date_end:
+        if len(tournament.rounds) > 0 and tournament.rounds[-1].date_end or len(tournament.rounds) == 0:
             self.main_view.impossible_action("Il n'y a pas de score à remplir dans ce tournoi")
             return
 

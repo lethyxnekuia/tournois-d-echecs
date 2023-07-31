@@ -1,5 +1,6 @@
 import re
 from models.player import Player
+from models.tournament import Tournament
 name_regex = re.compile('^[A-Z][A-Za-zéèêëïî-]+$')
 id_regex = re.compile('^[a-zA-Z0-9]+$')
 
@@ -9,7 +10,7 @@ class TournamentView:
         print("____________    Menu Tournoi    ____________")
         print("")
 
-    def input_tournament(self):
+    def input_tournament(self, tournaments):
         print("__________   Ajouter un Tournoi  ___________")
         print("")
         self.tournament_name = input("Nom du tournoi: ")
@@ -25,14 +26,16 @@ class TournamentView:
             print("Veuillez rentrer une date valide")
             self.date = Player.validate_date(input("Date du tournoi (aaaa-mm-jj) : "))
         self.number_of_rounds = input("Nombre de rounds : ")
-        while not self.number_of_rounds.isdigit() and self.number_of_rounds != "0":
+        while not self.number_of_rounds.isdigit() or str(self.number_of_rounds) == "0":
             print("Veuillez rentrer un nombre valide")
             self.number_of_rounds = input("Nombre de rounds : ")
         self.description = input("Description du tournoi : ")
         self.tournament_id = input("Identifiant du tournoi : ")
-        while id_regex.match(str(self.tournament_id)) is None:
+        is_unique = Tournament.unique_id(tournaments, self.tournament_id)
+        while id_regex.match(str(self.tournament_id)) is None or not is_unique:
             print("Veuillez rentrer un id valide")
             self.tournament_id = input("Identifiant du tournoi : ")
+            is_unique = Tournament.unique_id(tournaments, self.tournament_id)
         print("____________________________________________")
         print("")
         return {

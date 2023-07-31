@@ -50,6 +50,6 @@ class SaveAndLoadMenuController:
             for tournament in data["tournaments"]:
                 new_tournament = Tournament.tournament_loader(tournament, self.players)
                 self.tournaments.append(new_tournament)
-        except data.DoesNotExist:
+        except Exception:
             self.main_view.impossible_action("le chargement a échoué")
             return

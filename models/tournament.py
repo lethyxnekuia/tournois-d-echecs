@@ -61,3 +61,10 @@ class Tournament(object):
             Player.load_players(tournament["players"], players),
             Round.load_rounds(tournament["rounds"], players)
             )
+
+    @staticmethod
+    def unique_id(tournaments, id):
+        for tournament in tournaments:
+            if tournament.tournament_id == id:
+                return False
+        return True
