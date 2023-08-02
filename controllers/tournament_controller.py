@@ -177,7 +177,6 @@ class TournamentMenuController:
             None,
             round_match_list,
         )
-        print(new_round)
         return new_round
 
     def potential_player(self, player_one, player_two, rounds):
